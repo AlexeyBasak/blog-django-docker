@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{% if post %}Редактировать пост{% else %}Новый пост{% endif %}{% endblock %}
+
+{% block content %}
+    <h1>{% if post %}Редактировать пост{% else %}Новый пост{% endif %}</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% if post %}Сохранить{% else %}Опубликовать{% endif %}</button>
+        <a href="{% url 'blog:post_list' %}">Отмена</a>
+    </form>
+{% endblock %}

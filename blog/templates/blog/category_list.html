@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Категории{% endblock %}
+
+{% block content %}
+    <h1>Категории</h1>
+    
+    <ul>
+        {% for category in categories %}
+            <li>
+                <a href="{% url 'blog:posts_by_category' category.slug %}">{{ category.name }}</a>
+                ({{ category.post_count }} постов)
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

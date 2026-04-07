@@ -1,5 +1,6 @@
 from pathlib import Path
 import environ
+import sys
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -73,6 +74,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'main.wsgi.application'
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db_test.sqlite3',
+        }
+    }
 
 DATABASES = {
     'default': {

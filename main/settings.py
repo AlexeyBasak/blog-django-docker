@@ -1,29 +1,29 @@
 from pathlib import Path
-import environ
 import sys
 
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 
 env_file = BASE_DIR / '.env'
-
 if env_file.exists():
-    try:
-        environ.Env.read_env(env_file)
-        print(".env file loaded successfully")
-    except Exception as e:
-        print(f"Error loading .env: {e}")
+    environ.Env.read_env(env_file)
 
+TESTING = 'test' in sys.argv
 
-
-SECRET_KEY = env('SECRET_KEY', default='12345678')
-
+# --- Основные настройки ---
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
+if TESTING:
+    SECRET_KEY = 'test-only-insecure-key'
+else:
+    # Нет значения по умолчанию: без переменной приложение не стартует
+    SECRET_KEY = env('SECRET_KEY')
 
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -32,19 +32,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'accounts',
-	'blog',
+    'blog',
 ]
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,46 +65,36 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
-if 'test' in sys.argv:
+# --- База данных ---
+if TESTING:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db_test.sqlite3',
         }
     }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'blogdb',
-		'USER': 'bloguser',
-		'PASSWORD': env('PASSWORD', default='dev_key'),
-		'HOST': 'db',
-		'PORT': '5432',		
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('POSTGRES_DB'),
+            'USER': env('POSTGRES_USER'),
+            'PASSWORD': env('POSTGRES_PASSWORD'),
+            'HOST': env('POSTGRES_HOST', default='db'),
+            'PORT': env('POSTGRES_PORT', default='5432'),
+        }
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 MEDIA_URL = '/media/'
@@ -124,6 +104,14 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/blog/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+# --- Безопасность за HTTPS-прокси (включим на этапе с Let's Encrypt) ---
+HTTPS_ENABLED = env.bool('HTTPS_ENABLED', default=False)
+if HTTPS_ENABLED:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600  # потом увеличим
+    SECURE_CONTENT_TYPE_NOSNIFF = True

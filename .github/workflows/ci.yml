@@ -1,6 +1,8 @@
-name: Django Pipeline
+name: CI
 
-on: [push]
+on:
+  push:
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -10,24 +12,26 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: 'pip'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Django system check
+        run: python manage.py check
+        env:
+          SECRET_KEY: ci-only-key
+          POSTGRES_DB: x
+          POSTGRES_USER: x
+          POSTGRES_PASSWORD: x
+
       - name: Run tests
         run: python manage.py test
-        env:
-          DEBUG: True
-          SECRET_KEY: test-secret-key
-          ALLOWED_HOSTS: localhost,127.0.0.1

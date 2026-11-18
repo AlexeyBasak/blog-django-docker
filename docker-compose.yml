@@ -13,6 +13,7 @@ services:
 
   web:
     build: .
+    command: gunicorn main.wsgi:application --bind 0.0.0.0:8000 --reload
     env_file:
       - .env
     volumes:

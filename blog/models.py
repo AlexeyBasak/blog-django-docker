@@ -31,7 +31,11 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     image = models.ImageField(upload_to='posts/%Y/%m/%d/', blank=True, null=True)
-    status = models.CharField(max_length=10, choices=[('draft', 'Черновик'), ('published', 'Опубликован')], default='draft')
+    status = models.CharField(
+        max_length=10,
+        choices=[('draft', 'Черновик'), ('published', 'Опубликован')],
+        default='draft',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

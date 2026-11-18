@@ -17,7 +17,7 @@ TESTING = 'test' in sys.argv
 DEBUG = env.bool('DEBUG', default=False)
 
 if TESTING:
-    SECRET_KEY = 'test-only-insecure-key'
+    SECRET_KEY = 'test-only-insecure-key' # nosec B105
 else:
     # Нет значения по умолчанию: без переменной приложение не стартует
     SECRET_KEY = env('SECRET_KEY')

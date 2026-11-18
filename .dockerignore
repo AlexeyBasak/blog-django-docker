@@ -5,10 +5,16 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 .git
 .gitignore
+.github/
 .DS_Store
 .env
+.env.*
+!.env.example
 staticfiles/
 media/
 *.sqlite3
+terraform/
+ansible/

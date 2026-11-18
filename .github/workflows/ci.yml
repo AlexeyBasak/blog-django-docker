@@ -103,7 +103,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Trivy scan (quality gate: fail on CRITICAL)
+      - name: Trivy scan (quality gate - fail on CRITICAL)
         run: |
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \

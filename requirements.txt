@@ -1,4 +1,4 @@
-asgiref==3.11.1
+asgiref==3.13.0
 Django==6.0.10
 django-environ==0.13.0
 gunicorn==27.0.1

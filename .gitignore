@@ -9,3 +9,11 @@ staticfiles/
 .vscode/
 .idea/
 .gunicorn/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+key.json
+*-key.json

@@ -18,3 +18,4 @@ media/
 *.sqlite3
 terraform/
 ansible/
+.gunicorn/
